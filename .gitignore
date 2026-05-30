@@ -1,0 +1,36 @@
+```gitignore id="vq8trm"
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+.env
+
+# Streamlit
+.streamlit/
+
+# VS Code
+.vscode/
+
+# ML Models
+backend/app/models/*.pkl
+
+# Reports
+backend/app/reports/
+
+# Uploads
+backend/app/uploads/
+
+# Metadata
+backend/app/models/metadata/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+```

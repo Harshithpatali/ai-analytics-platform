@@ -1,0 +1,73 @@
+2026-05-27 18:33:48,952 | INFO | app.main | Root endpoint accessed.
+2026-05-27 21:43:38,570 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 21:43:39,512 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-27 21:52:00,376 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 21:52:01,261 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-27 21:56:07,549 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 21:56:08,250 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-27 22:04:03,423 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 22:04:04,184 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-27 22:13:51,097 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 22:13:51,757 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-27 22:29:39,385 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 22:29:40,047 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-27 22:38:03,893 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 22:38:04,411 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-27 22:46:20,300 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-27 22:46:21,128 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 09:10:11,961 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 09:10:12,535 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 09:21:46,511 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 09:21:47,016 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 09:45:24,368 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 09:45:24,368 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 09:45:24,750 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 09:45:25,081 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 10:04:05,510 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 10:04:05,952 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 10:24:34,519 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 10:24:34,876 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 10:41:24,060 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 10:41:24,429 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 10:47:44,504 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 10:47:44,827 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 10:53:26,402 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 10:53:26,733 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 21:38:12,954 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-28 21:38:14,007 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:02:19,058 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:02:19,553 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:04:44,738 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:04:45,237 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:07:25,450 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:07:25,450 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:07:25,777 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:07:26,166 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:19:49,884 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:19:50,211 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:26:17,028 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:26:17,462 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:36:53,997 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:36:54,350 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:43:12,342 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:43:12,675 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 22:50:57,290 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 22:50:57,729 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 23:00:15,834 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 23:00:16,079 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 23:10:56,985 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 23:10:57,320 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 23:19:17,363 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 23:19:17,623 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 23:26:37,841 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 23:26:38,262 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-28 23:42:47,413 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-28 23:42:47,857 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-29 10:06:12,156 | INFO | app.routes.upload | Dataset upload started: student_placement_career_success_dataset.csv
+2026-05-29 10:06:12,856 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-29 10:30:37,729 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-29 10:30:38,053 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-29 11:51:19,043 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-29 11:51:19,305 | INFO | app.routes.upload | Dataset uploaded successfully.
+2026-05-30 11:42:58,287 | INFO | app.routes.upload | Dataset upload started: kc_house_data.csv
+2026-05-30 11:42:58,506 | INFO | app.routes.upload | Dataset uploaded successfully.
