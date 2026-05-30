@@ -3,18 +3,53 @@ API client for backend communication.
 """
 
 import os
+
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-BACKEND_URL = os.getenv( "BACKEND_URL", "https://ai-analytics-platform-rgi6.onrender.com" )
+BACKEND_URL = os.getenv(
+    "BACKEND_URL",
+    "https://ai-analytics-platform-rgi6.onrender.com"
+)
 
 
 class APIClient:
     """
     Handles backend API requests.
     """
+
+    @staticmethod
+    def safe_json(response):
+        """
+        Safely parse JSON response.
+        """
+
+        try:
+
+            if response.status_code != 200:
+
+                return {
+                    "status": "error",
+                    "message": (
+                        f"API Error: "
+                        f"{response.status_code}"
+                    ),
+                    "response": response.text
+                }
+
+            return response.json()
+
+        except Exception:
+
+            return {
+                "status": "error",
+                "message": (
+                    "Invalid backend response."
+                ),
+                "raw_response": response.text
+            }
 
     @staticmethod
     def get_health():
@@ -29,7 +64,9 @@ class APIClient:
                 timeout=10
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -60,7 +97,9 @@ class APIClient:
                 timeout=300
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -82,7 +121,9 @@ class APIClient:
                 timeout=30
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -114,7 +155,9 @@ class APIClient:
                 timeout=300
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -136,7 +179,9 @@ class APIClient:
                 timeout=30
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -159,10 +204,12 @@ class APIClient:
             response = requests.get(
                 f"{BACKEND_URL}/api/{endpoint}",
                 params=params,
-                timeout=30
+                timeout=60
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -202,7 +249,9 @@ class APIClient:
                 timeout=300
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -253,7 +302,9 @@ class APIClient:
                 timeout=1200
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -281,7 +332,9 @@ class APIClient:
                 timeout=1200
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -309,7 +362,9 @@ class APIClient:
                 timeout=1200
             )
 
-            return response.json()
+            return APIClient.safe_json(
+                response
+            )
 
         except Exception as error:
 
@@ -328,7 +383,8 @@ class APIClient:
 
             response = requests.get(
                 f"{BACKEND_URL}"
-                "/api/download-predictions"
+                "/api/download-predictions",
+                timeout=300
             )
 
             return response

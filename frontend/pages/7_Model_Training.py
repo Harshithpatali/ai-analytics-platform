@@ -3,9 +3,10 @@ Model training dashboard.
 """
 
 import traceback
+
 import pandas as pd
-import streamlit as st
 import plotly.express as px
+import streamlit as st
 
 from utils.helpers import (
     set_page_config
@@ -28,23 +29,44 @@ summary_response = (
 )
 
 if (
-    summary_response["status"]
+    summary_response.get("status")
     != "success"
 ):
 
     st.error(
-        "Upload dataset first."
+        summary_response.get(
+            "message",
+            "Upload dataset first."
+        )
     )
 
     st.stop()
 
 summary = (
-    summary_response["summary"]
+    summary_response.get(
+        "summary",
+        {}
+    )
 )
+
+column_names = (
+    summary.get(
+        "column_names",
+        []
+    )
+)
+
+if not column_names:
+
+    st.warning(
+        "No dataset columns found."
+    )
+
+    st.stop()
 
 target_column = st.selectbox(
     "Target Column",
-    summary["column_names"]
+    column_names
 )
 
 if st.button(
@@ -69,33 +91,38 @@ if st.button(
         ):
 
             training_results = (
-                response[
-                    "training_results"
-                ]
+                response.get(
+                    "training_results",
+                    {}
+                )
             )
 
             problem_type = (
-                training_results[
-                    "problem_type"
-                ]
+                training_results.get(
+                    "problem_type",
+                    "Unknown"
+                )
             )
 
             results = (
-                training_results[
-                    "results"
-                ]
+                training_results.get(
+                    "results",
+                    {}
+                )
             )
 
             best_model = (
-                training_results[
-                    "best_model"
-                ]
+                training_results.get(
+                    "best_model",
+                    "Unknown"
+                )
             )
 
             recommendation = (
-                training_results[
-                    "recommendation"
-                ]
+                training_results.get(
+                    "recommendation",
+                    {}
+                )
             )
 
             st.success(
@@ -112,15 +139,26 @@ if st.button(
                 best_model
             )
 
-            st.info(
-                f"Recommended Model: "
-                f"{recommendation['recommended_model']}"
+            st.write(
+                f"Problem Type: "
+                f"{problem_type}"
             )
 
-            st.write(
-                f"Score: "
-                f"{recommendation['score']:.4f}"
+            st.info(
+                f"Recommended Model: "
+                f"{recommendation.get('recommended_model', 'N/A')}"
             )
+
+            score = recommendation.get(
+                "score"
+            )
+
+            if score is not None:
+
+                st.write(
+                    f"Score: "
+                    f"{score:.4f}"
+                )
 
             metrics_data = []
 
@@ -134,7 +172,10 @@ if st.button(
                 }
 
                 row.update(
-                    result["metrics"]
+                    result.get(
+                        "metrics",
+                        {}
+                    )
                 )
 
                 metrics_data.append(
@@ -151,51 +192,61 @@ if st.button(
                 "📊 Model Metrics"
             )
 
-            st.dataframe(
-                metrics_df,
-                use_container_width=True
-            )
+            if not metrics_df.empty:
 
-            # Keep only numeric metric columns
-
-            numeric_columns = []
-
-            for column in metrics_df.columns:
-
-                if column == "Model":
-                    continue
-
-                first_value = (
-                    metrics_df[column]
-                    .dropna()
-                    .iloc[0]
-                    if not metrics_df[column]
-                    .dropna()
-                    .empty
-                    else None
+                st.dataframe(
+                    metrics_df,
+                    use_container_width=True
                 )
 
-                if isinstance(
-                    first_value,
-                    (int, float)
-                ):
+                numeric_columns = []
 
-                    numeric_columns.append(
-                        column
+                for column in metrics_df.columns:
+
+                    if column == "Model":
+
+                        continue
+
+                    clean_series = (
+                        metrics_df[column]
+                        .dropna()
                     )
 
-            for metric in numeric_columns:
+                    if clean_series.empty:
 
-                fig = px.bar(
-                    metrics_df,
-                    x="Model",
-                    y=metric,
-                    title=f"{metric} Comparison"
-                )
+                        continue
 
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
+                    first_value = (
+                        clean_series.iloc[0]
+                    )
+
+                    if isinstance(
+                        first_value,
+                        (int, float)
+                    ):
+
+                        numeric_columns.append(
+                            column
+                        )
+
+                for metric in numeric_columns:
+
+                    fig = px.bar(
+                        metrics_df,
+                        x="Model",
+                        y=metric,
+                        title=f"{metric} Comparison"
+                    )
+
+                    st.plotly_chart(
+                        fig,
+                        use_container_width=True
+                    )
+
+            else:
+
+                st.warning(
+                    "No model metrics found."
                 )
 
             st.divider()
@@ -204,51 +255,71 @@ if st.button(
                 "📌 Individual Model Results"
             )
 
-            for model_name, result in (
-                results.items()
-            ):
+            if results:
 
-                with st.expander(
-                    model_name,
-                    expanded=False
+                for model_name, result in (
+                    results.items()
                 ):
 
-                    st.write(
-                        "### Metrics"
-                    )
+                    with st.expander(
+                        model_name,
+                        expanded=False
+                    ):
 
-                    st.json(
-                        result["metrics"]
-                    )
+                        st.write(
+                            "### Metrics"
+                        )
 
-                    st.write(
-                        "### Analytics"
-                    )
+                        st.json(
+                            result.get(
+                                "metrics",
+                                {}
+                            )
+                        )
 
-                    st.json(
-                        result["analytics"]
-                    )
+                        st.write(
+                            "### Analytics"
+                        )
 
-                    st.write(
-                        "### Model Path"
-                    )
+                        st.json(
+                            result.get(
+                                "analytics",
+                                {}
+                            )
+                        )
 
-                    st.code(
-                        result["model_path"]
-                    )
+                        st.write(
+                            "### Model Path"
+                        )
+
+                        st.code(
+                            result.get(
+                                "model_path",
+                                "N/A"
+                            )
+                        )
+
+            else:
+
+                st.warning(
+                    "No training results available."
+                )
 
         else:
 
             st.error(
                 response.get(
                     "detail",
-                    "Training failed."
+                    response.get(
+                        "message",
+                        "Training failed."
+                    )
                 )
             )
 
             st.json(response)
 
-    except Exception as error:
+    except Exception:
 
         st.error(
             "Unexpected error occurred."

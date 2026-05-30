@@ -2,10 +2,11 @@
 Data cleaning dashboard.
 """
 
-import streamlit as st
-import pandas as pd
 import os
+
+import pandas as pd
 import requests
+import streamlit as st
 
 from utils.helpers import (
     set_page_config
@@ -23,10 +24,12 @@ st.title(
     "🧹 Automated Data Cleaning"
 )
 
-st.markdown("""
+st.markdown(
+    """
 Clean datasets automatically using
 advanced preprocessing techniques.
-""")
+"""
+)
 
 st.divider()
 
@@ -59,15 +62,16 @@ if st.button(
             )
         )
 
-    if response["status"] == "success":
+    if response.get("status") == "success":
 
         st.success(
             "Dataset cleaned successfully."
         )
 
-        report = response[
-            "cleaning_report"
-        ]
+        report = response.get(
+            "cleaning_report",
+            {}
+        )
 
         st.divider()
 
@@ -77,6 +81,16 @@ if st.button(
 
         col1, col2 = st.columns(2)
 
+        before_shape = report.get(
+            "before_shape",
+            [0, 0]
+        )
+
+        after_shape = report.get(
+            "after_shape",
+            [0, 0]
+        )
+
         with col1:
 
             st.markdown(
@@ -85,24 +99,28 @@ if st.button(
 
             st.metric(
                 "Rows",
-                report["before_shape"][0]
+                before_shape[0]
             )
 
             st.metric(
                 "Columns",
-                report["before_shape"][1]
+                before_shape[1]
             )
 
             st.metric(
                 "Missing Values",
-                report["before_missing"]
+                report.get(
+                    "before_missing",
+                    0
+                )
             )
 
             st.metric(
                 "Duplicates",
-                report[
-                    "before_duplicates"
-                ]
+                report.get(
+                    "before_duplicates",
+                    0
+                )
             )
 
         with col2:
@@ -113,24 +131,28 @@ if st.button(
 
             st.metric(
                 "Rows",
-                report["after_shape"][0]
+                after_shape[0]
             )
 
             st.metric(
                 "Columns",
-                report["after_shape"][1]
+                after_shape[1]
             )
 
             st.metric(
                 "Missing Values",
-                report["after_missing"]
+                report.get(
+                    "after_missing",
+                    0
+                )
             )
 
             st.metric(
                 "Duplicates",
-                report[
-                    "after_duplicates"
-                ]
+                report.get(
+                    "after_duplicates",
+                    0
+                )
             )
 
         st.divider()
@@ -139,15 +161,15 @@ if st.button(
             "🚨 Outlier Analysis"
         )
 
-        # Create safe outlier comparison dataframe
+        before_outliers = report.get(
+            "outliers_before",
+            {}
+        )
 
-        before_outliers = report[
-            "outliers_before"
-        ]
-
-        after_outliers = report[
-            "outliers_after"
-        ]
+        after_outliers = report.get(
+            "outliers_after",
+            {}
+        )
 
         all_columns = list(
             set(before_outliers.keys())
@@ -193,7 +215,7 @@ if st.button(
 
         backend_url = os.getenv(
             "BACKEND_URL",
-            "http://127.0.0.1:8000"
+            "https://ai-analytics-platform-rgi6.onrender.com"
         )
 
         download_url = (
@@ -201,23 +223,35 @@ if st.button(
             "/api/download-cleaned-data"
         )
 
-        download_response = requests.get(
-            download_url
-        )
+        try:
 
-        if download_response.status_code == 200:
-
-            st.download_button(
-                label="Download Cleaned CSV",
-                data=download_response.content,
-                file_name="cleaned_dataset.csv",
-                mime="text/csv"
+            download_response = requests.get(
+                download_url,
+                timeout=60
             )
 
-        else:
+            if (
+                download_response.status_code
+                == 200
+            ):
+
+                st.download_button(
+                    label="Download Cleaned CSV",
+                    data=download_response.content,
+                    file_name="cleaned_dataset.csv",
+                    mime="text/csv"
+                )
+
+            else:
+
+                st.error(
+                    "Failed to download cleaned dataset."
+                )
+
+        except Exception as error:
 
             st.error(
-                "Failed to download cleaned dataset."
+                f"Download error: {error}"
             )
 
     else:

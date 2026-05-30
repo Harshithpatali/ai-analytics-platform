@@ -3,8 +3,8 @@ AI insights dashboard.
 """
 
 import pandas as pd
-import streamlit as st
 import plotly.express as px
+import streamlit as st
 
 from utils.helpers import (
     set_page_config
@@ -39,10 +39,12 @@ model_name = st.selectbox(
 
 st.divider()
 
-st.markdown("""
+st.markdown(
+    """
 Generate SHAP explainability and
 AI-powered business insights.
-""")
+"""
+)
 
 if st.button(
     "Generate AI Insights"
@@ -68,16 +70,16 @@ if st.button(
         )
 
         explainability = (
-            response[
-                "explainability"
-            ]
+            response.get(
+                "explainability",
+                {}
+            )
         )
 
-        importance_df = (
-            pd.DataFrame(
-                explainability[
-                    "feature_importance"
-                ]
+        feature_importance = (
+            explainability.get(
+                "feature_importance",
+                []
             )
         )
 
@@ -87,30 +89,52 @@ if st.button(
             "🔥 SHAP Feature Importance"
         )
 
-        fig = px.bar(
-            importance_df.head(20),
-            x="Feature",
-            y="Importance",
-            title=(
-                "Global Feature Importance"
+        if feature_importance:
+
+            importance_df = (
+                pd.DataFrame(
+                    feature_importance
+                )
             )
-        )
 
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
+            if (
+                "Feature"
+                in importance_df.columns
+                and
+                "Importance"
+                in importance_df.columns
+            ):
 
-        st.divider()
+                fig = px.bar(
+                    importance_df.head(20),
+                    x="Feature",
+                    y="Importance",
+                    title=(
+                        "Global Feature Importance"
+                    )
+                )
 
-        st.subheader(
-            "📊 Feature Importance Table"
-        )
+                st.plotly_chart(
+                    fig,
+                    use_container_width=True
+                )
 
-        st.dataframe(
-            importance_df,
-            use_container_width=True
-        )
+            st.divider()
+
+            st.subheader(
+                "📊 Feature Importance Table"
+            )
+
+            st.dataframe(
+                importance_df,
+                use_container_width=True
+            )
+
+        else:
+
+            st.warning(
+                "No feature importance data found."
+            )
 
         st.divider()
 
@@ -119,23 +143,25 @@ if st.button(
         )
 
         insights = (
-            response[
-                "ai_insights"
-            ]
+            response.get(
+                "ai_insights",
+                "No AI insights available."
+            )
         )
 
         st.markdown(
             insights
         )
 
-        
-
     else:
 
         st.error(
             response.get(
                 "detail",
-                "AI insights failed."
+                response.get(
+                    "message",
+                    "AI insights failed."
+                )
             )
         )
 

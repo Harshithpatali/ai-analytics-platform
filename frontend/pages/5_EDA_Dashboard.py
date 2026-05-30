@@ -2,7 +2,6 @@
 EDA dashboard.
 """
 
-import json
 import streamlit as st
 import plotly.io as pio
 
@@ -27,32 +26,43 @@ summary_response = (
 )
 
 if (
-    summary_response["status"]
+    summary_response.get("status")
     != "success"
 ):
 
     st.error(
-        "Failed to load EDA summary."
+        summary_response.get(
+            "message",
+            "Failed to load EDA summary."
+        )
     )
 
     st.stop()
 
 summary = (
-    summary_response[
-        "eda_summary"
-    ]
+    summary_response.get(
+        "eda_summary",
+        {}
+    )
 )
 
 numerical_columns = (
-    summary[
-        "numerical_columns"
-    ]
+    summary.get(
+        "numerical_columns",
+        []
+    )
 )
 
 categorical_columns = (
-    summary[
-        "categorical_columns"
-    ]
+    summary.get(
+        "categorical_columns",
+        []
+    )
+)
+
+shape = summary.get(
+    "shape",
+    [0, 0]
 )
 
 st.divider()
@@ -65,17 +75,20 @@ col1, col2, col3 = st.columns(3)
 
 col1.metric(
     "Rows",
-    summary["shape"][0]
+    shape[0]
 )
 
 col2.metric(
     "Columns",
-    summary["shape"][1]
+    shape[1]
 )
 
 col3.metric(
     "Duplicates",
-    summary["duplicate_rows"]
+    summary.get(
+        "duplicate_rows",
+        0
+    )
 )
 
 st.divider()
@@ -84,53 +97,73 @@ st.subheader(
     "📈 Numerical Analysis"
 )
 
-selected_num_column = (
-    st.selectbox(
-        "Select Numerical Column",
-        numerical_columns
-    )
-)
+if numerical_columns:
 
-chart_type = st.selectbox(
-    "Select Chart Type",
-    [
-        "Histogram",
-        "Boxplot"
-    ]
-)
-
-if chart_type == "Histogram":
-
-    chart_response = (
-        APIClient.get_chart(
-            "histogram",
-            {
-                "column":
-                selected_num_column
-            }
+    selected_num_column = (
+        st.selectbox(
+            "Select Numerical Column",
+            numerical_columns
         )
     )
+
+    chart_type = st.selectbox(
+        "Select Chart Type",
+        [
+            "Histogram",
+            "Boxplot"
+        ]
+    )
+
+    if chart_type == "Histogram":
+
+        chart_response = (
+            APIClient.get_chart(
+                "histogram",
+                {
+                    "column":
+                    selected_num_column
+                }
+            )
+        )
+
+    else:
+
+        chart_response = (
+            APIClient.get_chart(
+                "boxplot",
+                {
+                    "column":
+                    selected_num_column
+                }
+            )
+        )
+
+    chart_json = chart_response.get(
+        "chart"
+    )
+
+    if chart_json:
+
+        fig = pio.from_json(
+            chart_json
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+    else:
+
+        st.warning(
+            "Failed to generate chart."
+        )
 
 else:
 
-    chart_response = (
-        APIClient.get_chart(
-            "boxplot",
-            {
-                "column":
-                selected_num_column
-            }
-        )
+    st.info(
+        "No numerical columns found."
     )
-
-fig = pio.from_json(
-    chart_response["chart"]
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
 
 st.divider()
 
@@ -138,39 +171,61 @@ st.subheader(
     "🔗 Scatter Plot Analysis"
 )
 
-x_column = st.selectbox(
-    "X-Axis",
-    numerical_columns,
-    key="x"
-)
+if len(numerical_columns) >= 2:
 
-y_column = st.selectbox(
-    "Y-Axis",
-    numerical_columns,
-    key="y"
-)
-
-scatter_response = (
-    APIClient.get_chart(
-        "scatter-plot",
-        {
-            "x_column":
-            x_column,
-
-            "y_column":
-            y_column
-        }
+    x_column = st.selectbox(
+        "X-Axis",
+        numerical_columns,
+        key="x"
     )
-)
 
-scatter_fig = pio.from_json(
-    scatter_response["chart"]
-)
+    y_column = st.selectbox(
+        "Y-Axis",
+        numerical_columns,
+        key="y"
+    )
 
-st.plotly_chart(
-    scatter_fig,
-    use_container_width=True
-)
+    scatter_response = (
+        APIClient.get_chart(
+            "scatter-plot",
+            {
+                "x_column":
+                x_column,
+
+                "y_column":
+                y_column
+            }
+        )
+    )
+
+    scatter_chart = (
+        scatter_response.get(
+            "chart"
+        )
+    )
+
+    if scatter_chart:
+
+        scatter_fig = pio.from_json(
+            scatter_chart
+        )
+
+        st.plotly_chart(
+            scatter_fig,
+            use_container_width=True
+        )
+
+    else:
+
+        st.warning(
+            "Failed to generate scatter plot."
+        )
+
+else:
+
+    st.info(
+        "At least two numerical columns are required."
+    )
 
 st.divider()
 
@@ -184,14 +239,28 @@ heatmap_response = (
     )
 )
 
-heatmap_fig = pio.from_json(
-    heatmap_response["chart"]
+heatmap_chart = (
+    heatmap_response.get(
+        "chart"
+    )
 )
 
-st.plotly_chart(
-    heatmap_fig,
-    use_container_width=True
-)
+if heatmap_chart:
+
+    heatmap_fig = pio.from_json(
+        heatmap_chart
+    )
+
+    st.plotly_chart(
+        heatmap_fig,
+        use_container_width=True
+    )
+
+else:
+
+    st.warning(
+        "Failed to generate correlation heatmap."
+    )
 
 st.divider()
 
@@ -205,14 +274,28 @@ missing_response = (
     )
 )
 
-missing_fig = pio.from_json(
-    missing_response["chart"]
+missing_chart = (
+    missing_response.get(
+        "chart"
+    )
 )
 
-st.plotly_chart(
-    missing_fig,
-    use_container_width=True
-)
+if missing_chart:
+
+    missing_fig = pio.from_json(
+        missing_chart
+    )
+
+    st.plotly_chart(
+        missing_fig,
+        use_container_width=True
+    )
+
+else:
+
+    st.warning(
+        "Failed to generate missing value heatmap."
+    )
 
 st.divider()
 
@@ -239,14 +322,26 @@ if categorical_columns:
         )
     )
 
-    cat_fig = pio.from_json(
-        cat_response["chart"]
+    cat_chart = cat_response.get(
+        "chart"
     )
 
-    st.plotly_chart(
-        cat_fig,
-        use_container_width=True
-    )
+    if cat_chart:
+
+        cat_fig = pio.from_json(
+            cat_chart
+        )
+
+        st.plotly_chart(
+            cat_fig,
+            use_container_width=True
+        )
+
+    else:
+
+        st.warning(
+            "Failed to generate categorical chart."
+        )
 
 else:
 

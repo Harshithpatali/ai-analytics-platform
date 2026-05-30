@@ -44,10 +44,12 @@ st.subheader(
     "🚀 Batch Predictions"
 )
 
-st.markdown("""
+st.markdown(
+    """
 Generate predictions using the
 selected trained model.
-""")
+"""
+)
 
 if st.button(
     "Generate Predictions"
@@ -78,33 +80,64 @@ if st.button(
             "⬇ Download Predictions"
         )
 
-        download_response = (
-            APIClient
-            .download_predictions()
-        )
+        try:
 
-        if (
-            download_response
-            .status_code == 200
-        ):
-
-            prediction_df =pd.read_csv( BytesIO( download_response.content ) )
-            st.dataframe(
-                prediction_df.head(20),
-                use_container_width=True
+            download_response = (
+                APIClient
+                .download_predictions()
             )
 
-            st.download_button(
-                label=(
-                    "Download Predictions CSV"
-                ),
-                data=(
-                    download_response.content
-                ),
-                file_name=(
-                    "predictions.csv"
-                ),
-                mime="text/csv"
+            if (
+                download_response
+                and
+                download_response.status_code
+                == 200
+            ):
+
+                try:
+
+                    prediction_df = (
+                        pd.read_csv(
+                            BytesIO(
+                                download_response.content
+                            )
+                        )
+                    )
+
+                    st.dataframe(
+                        prediction_df.head(20),
+                        use_container_width=True
+                    )
+
+                except Exception as error:
+
+                    st.warning(
+                        f"Failed to preview predictions: {error}"
+                    )
+
+                st.download_button(
+                    label=(
+                        "Download Predictions CSV"
+                    ),
+                    data=(
+                        download_response.content
+                    ),
+                    file_name=(
+                        "predictions.csv"
+                    ),
+                    mime="text/csv"
+                )
+
+            else:
+
+                st.error(
+                    "Failed to download predictions."
+                )
+
+        except Exception as error:
+
+            st.error(
+                f"Download error: {error}"
             )
 
     else:
@@ -112,7 +145,10 @@ if st.button(
         st.error(
             response.get(
                 "detail",
-                "Prediction failed."
+                response.get(
+                    "message",
+                    "Prediction failed."
+                )
             )
         )
 

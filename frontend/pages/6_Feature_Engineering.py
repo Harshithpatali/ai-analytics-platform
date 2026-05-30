@@ -2,9 +2,9 @@
 Feature engineering dashboard.
 """
 
-import streamlit as st
 import pandas as pd
 import plotly.express as px
+import streamlit as st
 
 from utils.helpers import (
     set_page_config
@@ -27,23 +27,40 @@ summary_response = (
 )
 
 if (
-    summary_response["status"]
+    summary_response.get("status")
     != "success"
 ):
 
     st.error(
-        "Upload dataset first."
+        summary_response.get(
+            "message",
+            "Upload dataset first."
+        )
     )
 
     st.stop()
 
 summary = (
-    summary_response["summary"]
+    summary_response.get(
+        "summary",
+        {}
+    )
 )
 
 columns = (
-    summary["column_names"]
+    summary.get(
+        "column_names",
+        []
+    )
 )
+
+if not columns:
+
+    st.warning(
+        "No columns found in dataset."
+    )
+
+    st.stop()
 
 st.divider()
 
@@ -114,9 +131,10 @@ if st.button(
         )
 
         st.write(
-            response[
-                "removed_correlated_features"
-            ]
+            response.get(
+                "removed_correlated_features",
+                []
+            )
         )
 
         st.divider()
@@ -126,9 +144,10 @@ if st.button(
         )
 
         st.write(
-            response[
-                "removed_low_variance_features"
-            ]
+            response.get(
+                "removed_low_variance_features",
+                []
+            )
         )
 
         st.divider()
@@ -137,37 +156,46 @@ if st.button(
             "📉 PCA Explained Variance"
         )
 
-        pca_df = pd.DataFrame(
-            {
-                "Component": [
-                    f"PC{i+1}"
-                    for i in range(
-                        len(
-                            response[
-                                "pca_explained_variance"
-                            ]
+        pca_variance = response.get(
+            "pca_explained_variance",
+            []
+        )
+
+        if pca_variance:
+
+            pca_df = pd.DataFrame(
+                {
+                    "Component": [
+                        f"PC{i+1}"
+                        for i in range(
+                            len(
+                                pca_variance
+                            )
                         )
-                    )
-                ],
+                    ],
 
-                "Explained Variance":
-                    response[
-                        "pca_explained_variance"
-                    ]
-            }
-        )
+                    "Explained Variance":
+                        pca_variance
+                }
+            )
 
-        pca_chart = px.bar(
-            pca_df,
-            x="Component",
-            y="Explained Variance",
-            title="PCA Explained Variance"
-        )
+            pca_chart = px.bar(
+                pca_df,
+                x="Component",
+                y="Explained Variance",
+                title="PCA Explained Variance"
+            )
 
-        st.plotly_chart(
-            pca_chart,
-            use_container_width=True
-        )
+            st.plotly_chart(
+                pca_chart,
+                use_container_width=True
+            )
+
+        else:
+
+            st.warning(
+                "No PCA variance data found."
+            )
 
         st.divider()
 
@@ -176,25 +204,38 @@ if st.button(
         )
 
         split_info = (
-            response[
-                "train_test_split"
-            ]
+            response.get(
+                "train_test_split",
+                {}
+            )
         )
 
         x_train_shape = (
-            split_info["x_train_shape"]
+            split_info.get(
+                "x_train_shape",
+                [0, 0]
+            )
         )
 
         x_test_shape = (
-            split_info["x_test_shape"]
+            split_info.get(
+                "x_test_shape",
+                [0, 0]
+            )
         )
 
         y_train_shape = (
-            split_info["y_train_shape"]
+            split_info.get(
+                "y_train_shape",
+                [0]
+            )
         )
 
         y_test_shape = (
-            split_info["y_test_shape"]
+            split_info.get(
+                "y_test_shape",
+                [0]
+            )
         )
 
         col1, col2, col3, col4 = (
@@ -247,32 +288,51 @@ if st.button(
             "🔥 Feature Importance"
         )
 
-        importance_df = (
-            pd.DataFrame(
-                response[
-                    "feature_importance"
-                ]
+        feature_importance = response.get(
+            "feature_importance",
+            []
+        )
+
+        if feature_importance:
+
+            importance_df = (
+                pd.DataFrame(
+                    feature_importance
+                )
             )
-        )
 
-        importance_chart = px.bar(
-            importance_df.head(20),
-            x="Feature",
-            y="Importance",
-            title=(
-                "Top Feature Importance"
+            if (
+                "Feature"
+                in importance_df.columns
+                and
+                "Importance"
+                in importance_df.columns
+            ):
+
+                importance_chart = px.bar(
+                    importance_df.head(20),
+                    x="Feature",
+                    y="Importance",
+                    title=(
+                        "Top Feature Importance"
+                    )
+                )
+
+                st.plotly_chart(
+                    importance_chart,
+                    use_container_width=True
+                )
+
+            st.dataframe(
+                importance_df,
+                use_container_width=True
             )
-        )
 
-        st.plotly_chart(
-            importance_chart,
-            use_container_width=True
-        )
+        else:
 
-        st.dataframe(
-            importance_df,
-            use_container_width=True
-        )
+            st.warning(
+                "No feature importance data found."
+            )
 
         st.divider()
 
@@ -280,32 +340,42 @@ if st.button(
             "⬇ Download Dataset"
         )
 
-        download_response = (
-            APIClient
-            .download_transformed_dataset()
-        )
+        try:
 
-        if (
-            download_response
-            .status_code == 200
-        ):
-
-            st.download_button(
-                label=(
-                    "Download "
-                    "Transformed Dataset"
-                ),
-                data=download_response.content,
-                file_name=(
-                    "transformed_dataset.csv"
-                ),
-                mime="text/csv"
+            download_response = (
+                APIClient
+                .download_transformed_dataset()
             )
 
-        else:
+            if (
+                download_response
+                and
+                download_response.status_code
+                == 200
+            ):
+
+                st.download_button(
+                    label=(
+                        "Download "
+                        "Transformed Dataset"
+                    ),
+                    data=download_response.content,
+                    file_name=(
+                        "transformed_dataset.csv"
+                    ),
+                    mime="text/csv"
+                )
+
+            else:
+
+                st.error(
+                    "Failed to download dataset."
+                )
+
+        except Exception as error:
 
             st.error(
-                "Failed to download dataset."
+                f"Download error: {error}"
             )
 
     else:

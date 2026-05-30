@@ -9,17 +9,24 @@ from utils.helpers import (
     set_page_config
 )
 
-from utils.api_client import APIClient
+from utils.api_client import (
+    APIClient
+)
 
+set_page_config(
+    "Upload Dataset"
+)
 
-set_page_config("Upload Dataset")
+st.title(
+    "📂 Upload Dataset"
+)
 
-st.title("📂 Upload Dataset")
-
-st.markdown("""
+st.markdown(
+    """
 Upload CSV or Excel datasets for
 automated analytics and machine learning.
-""")
+"""
+)
 
 uploaded_file = st.file_uploader(
     "Upload CSV or Excel File",
@@ -41,13 +48,16 @@ if uploaded_file:
             .upload_dataset(uploaded_file)
         )
 
-    if response["status"] == "success":
+    if response.get("status") == "success":
 
         st.success(
             "Dataset uploaded successfully."
         )
 
-        summary = response["summary"]
+        summary = response.get(
+            "summary",
+            {}
+        )
 
         st.subheader(
             "📊 Dataset Summary"
@@ -57,26 +67,30 @@ if uploaded_file:
 
         col1.metric(
             "Rows",
-            summary["rows"]
+            summary.get("rows", 0)
         )
 
         col2.metric(
             "Columns",
-            summary["columns"]
+            summary.get("columns", 0)
         )
 
         col3.metric(
             "Missing Values",
             sum(
-                summary[
-                    "missing_values"
-                ].values()
+                summary.get(
+                    "missing_values",
+                    {}
+                ).values()
             )
         )
 
         col4.metric(
             "Duplicates",
-            summary["duplicate_rows"]
+            summary.get(
+                "duplicate_rows",
+                0
+            )
         )
 
         st.divider()
@@ -87,17 +101,23 @@ if uploaded_file:
 
         st.write(
             f"Memory Usage: "
-            f"{summary['memory_usage_mb']} MB"
+            f"{summary.get('memory_usage_mb', 0)} MB"
         )
 
         st.write(
             "Numerical Columns:",
-            summary["numerical_columns"]
+            summary.get(
+                "numerical_columns",
+                []
+            )
         )
 
         st.write(
             "Categorical Columns:",
-            summary["categorical_columns"]
+            summary.get(
+                "categorical_columns",
+                []
+            )
         )
 
         st.divider()
@@ -106,14 +126,19 @@ if uploaded_file:
             "📌 Column Data Types"
         )
 
+        data_types = summary.get(
+            "data_types",
+            {}
+        )
+
         dtype_df = pd.DataFrame(
             {
-                "Column": summary[
-                    "data_types"
-                ].keys(),
-                "Data Type": summary[
-                    "data_types"
-                ].values(),
+                "Column": list(
+                    data_types.keys()
+                ),
+                "Data Type": list(
+                    data_types.values()
+                ),
             }
         )
 
@@ -128,14 +153,19 @@ if uploaded_file:
             "⚠ Missing Values"
         )
 
+        missing_values = summary.get(
+            "missing_values",
+            {}
+        )
+
         missing_df = pd.DataFrame(
             {
-                "Column": summary[
-                    "missing_values"
-                ].keys(),
-                "Missing Values": summary[
-                    "missing_values"
-                ].values(),
+                "Column": list(
+                    missing_values.keys()
+                ),
+                "Missing Values": list(
+                    missing_values.values()
+                ),
             }
         )
 
